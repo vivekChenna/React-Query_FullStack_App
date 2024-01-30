@@ -1,8 +1,10 @@
 import { toast } from "react-hot-toast";
+import { User_API } from "@/constants/constant";
+
+
+
 export const getUserDetails = async () => {
-  let response = await fetch(
-    "https://65b790e246324d531d54efe3.mockapi.io/users"
-  );
+  let response = await fetch(User_API);
   let data = await response.json();
   return data;
 };
@@ -15,7 +17,7 @@ export const addUser = async (data) => {
     },
     body: JSON.stringify(data),
   };
-  await fetch("https://65b790e246324d531d54efe3.mockapi.io/users", options);
+  await fetch(User_API, options);
 
   toast.success("user created");
 };
@@ -36,10 +38,7 @@ export async function updateUser(data) {
     body: JSON.stringify(newUpdatedDetails),
   };
 
-  const response = await fetch(
-    `https://65b790e246324d531d54efe3.mockapi.io/users/${data.id}`,
-    options
-  );
+  const response = await fetch(`${User_API}/${data.id}`, options);
   console.log(response);
 
   toast.success("user updated successfully");
@@ -50,10 +49,7 @@ export const deleteUser = async (id) => {
     method: "DELETE",
   };
 
-  const response = await fetch(
-    `https://65b790e246324d531d54efe3.mockapi.io/users/${id}`,
-    options
-  );
+  const response = await fetch(`${User_API}/${id}`, options);
   console.log(response);
 
   toast.error("user removed");

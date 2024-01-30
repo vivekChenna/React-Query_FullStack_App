@@ -58,7 +58,7 @@ const AddUserForm = ({AddUserFunction}) => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>First Name</FormLabel>
+                  <FormLabel className="text-[16px]">First Name</FormLabel>
                   <FormControl>
                     <Input placeholder="vivek" {...field} />
                   </FormControl>
@@ -74,7 +74,7 @@ const AddUserForm = ({AddUserFunction}) => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Last Name</FormLabel>
+                  <FormLabel className="text-[16px]">Last Name</FormLabel>
                   <FormControl>
                     <Input placeholder="chenna" {...field} />
                   </FormControl>
@@ -90,7 +90,7 @@ const AddUserForm = ({AddUserFunction}) => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-[16px]">Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
