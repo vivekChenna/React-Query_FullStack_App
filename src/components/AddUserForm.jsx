@@ -39,13 +39,9 @@ const AddUserForm = ({AddUserFunction}) => {
  
 
   const onSubmit = (data)=>{
-    console.log(data);
     AddUserFunction(data);
     form.reset();
   }
-
-
-
   return (
    
       <div className="w-[600px] mx-auto mb-5 border-none">

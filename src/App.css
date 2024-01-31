@@ -1,0 +1,25 @@
+.custom-loader {
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:conic-gradient(#0000 10%,#1e2534);
+    -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+    animation:s3 1s infinite linear;
+  }
+  @keyframes s3 {to{transform: rotate(1turn)}}
+
+  .spinner {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(farthest-side,#1e2534 94%,#0000) top/9px 9px no-repeat,
+           conic-gradient(#0000 30%,#1e2534);
+    -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 9px),#000 0);
+    animation: spinner-c7wet2 1s infinite linear;
+ }
+ 
+ @keyframes spinner-c7wet2 {
+    100% {
+       transform: rotate(1turn);
+    }
+ }

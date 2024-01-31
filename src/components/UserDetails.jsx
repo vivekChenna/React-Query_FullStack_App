@@ -27,6 +27,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
+import Loader from "./Loader";
+import UserDataLoader from "./UserDataLoader";
 
 const UserDetails = () => {
   const [newUserDetails, setNewUserDetails] = useState({
@@ -35,49 +37,82 @@ const UserDetails = () => {
     email: "",
   });
 
-  const [open, setOpen] = useState(false);
-
   const HandleChange = (e) => {
     const { name, value } = e.target;
-
     setNewUserDetails((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError: isQueryError,
+    error,
+  } = useQuery({
     queryKey: ["users"],
     queryFn: getUserDetails,
-    staleTime: Infinity,
   });
 
-  const { mutate: addUserMutation } = useMutation({
+  const {
+    status: addUserStatus,
+    mutate: addUserMutation,
+    isPending: isAddingUser,
+    isError: isErrorAddUser,
+  } = useMutation({
     mutationFn: addUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["users"]);
+    onSuccess: (data) => {
+      queryClient.setQueryData(["users"], (oldQueryData) => {
+        return [...oldQueryData, data];
+      });
+    },
+    onError: (error) => {
+      console.log("something went wrong" + error.message);
     },
   });
 
-  const { mutate: removeUserMutation } = useMutation({
-    mutationFn: deleteUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["users"]);
-    },
-  });
+  const { mutate: removeUserMutation, isPending: isRemovingUser } = useMutation(
+    {
+      mutationFn: deleteUser,
+      onSuccess: (data) => {
+        queryClient.setQueryData(["users"], (oldQueryData) => {
+          return oldQueryData.filter((obj) => {
+            return obj.id !== data.id;
+          });
+        });
+      },
+    }
+  );
 
-  const { mutate: updateUserMutation } = useMutation({
-    mutationFn: updateUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["users"]);
-    },
-  });
+  const { mutate: updateUserMutation, isPending: isUpdatingUser } = useMutation(
+    {
+      mutationFn: updateUser,
+      onSuccess: () => {
+        queryClient.invalidateQueries(["users"]);
+      },
+    }
+  );
 
   if (isLoading) {
-    return <p>Loading</p>;
+    return (
+      <div className=" w-[100vw] h-[80vh] flex items-center justify-center flex-col">
+        <Loader />
+        <p className=" text-2xl font-semibold">Loading...</p>
+      </div>
+    );
   }
 
-  if (error) {
-    return <p>Error:{error.message}</p>;
+  if (isQueryError) {
+    if (error.message === '["users"] data is undefined') {
+      return (
+        <div className=" w-full h-full flex flex-col gap-1 items-center justify-center">
+          <p className=" font-semibold text-red-500 text-3xl">Network Error</p>
+          <p className=" font-semibold text-xl text-red-500">you are offline</p>
+        </div>
+      );
+    } else {
+      return <h2 className=" font-semibold text-3xl">{error.message}</h2>;
+    }
   }
 
   const AddUserFunction = (data) => {
@@ -90,7 +125,6 @@ const UserDetails = () => {
       lastName: user.lastName,
       email: user.email,
     });
-    setOpen(true);
   };
 
   const handleSaveChanges = (id) => {
@@ -106,15 +140,22 @@ const UserDetails = () => {
       return;
     } else {
       updateUserMutation({ ...newUserDetails, id: id });
-      setOpen(false);
     }
   };
 
+
+
   return (
-    <div className=" w-[1100px] mx-auto mt-4">
+    <div className=" w-[1100px] mx-auto mt-4 mb-4">
       <AddUserForm AddUserFunction={AddUserFunction} />
 
-      {data.length === 0 ? (
+      {isErrorAddUser ? (
+        <div className="text-center">
+          <p className=" font-semibold text-4xl text-red-500">
+            Something went wrong
+          </p>
+        </div>
+      ) : data.length === 0 ? (
         <div className="text-center">
           <h1 className=" font-semibold text-5xl">No User Found</h1>
           <p className=" text-sm mt-1 text-gray-500">
@@ -132,9 +173,11 @@ const UserDetails = () => {
               <TableHead className="text-right">Operations</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {data &&
-              data.map((user) => (
+          {isRemovingUser || isUpdatingUser || isAddingUser ? (
+            <UserDataLoader />
+          ) : (
+            <TableBody>
+              {data?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user?.id}</TableCell>
                   <TableCell>{user?.firstName}</TableCell>
@@ -218,9 +261,9 @@ const UserDetails = () => {
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
+            </TableBody>
+          )}
         </Table>
-        // here comes the logic for update User Details
       )}
     </div>
   );

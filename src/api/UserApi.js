@@ -1,56 +1,79 @@
 import { toast } from "react-hot-toast";
 import { User_API } from "@/constants/constant";
 
-
-
 export const getUserDetails = async () => {
-  let response = await fetch(User_API);
-  let data = await response.json();
-  return data;
+  try {
+    let response = await fetch(User_API);
+    let data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const addUser = async (data) => {
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  };
-  await fetch(User_API, options);
+  try {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    };
+    const response = await fetch(User_API, options);
+    console.log("response inside add user");
 
-  toast.success("user created");
+    const jsonData = await response.json();
+
+    toast.success("user created");
+    return jsonData;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export async function updateUser(data) {
-  console.log(data);
-  const newUpdatedDetails = {
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-  };
+  try {
+    const newUpdatedDetails = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+    };
 
-  const options = {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newUpdatedDetails),
-  };
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newUpdatedDetails),
+    };
 
-  const response = await fetch(`${User_API}/${data.id}`, options);
-  console.log(response);
+    const response = await fetch(`${User_API}/${data.id}`, options);
 
-  toast.success("user updated successfully");
+    const jsonData = await response.json();
+    console.log("inside update api");
+    console.log(jsonData);
+
+    toast.success("user updated successfully");
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export const deleteUser = async (id) => {
-  const options = {
-    method: "DELETE",
-  };
+  try {
+    const options = {
+      method: "DELETE",
+    };
 
-  const response = await fetch(`${User_API}/${id}`, options);
-  console.log(response);
+    const response = await fetch(`${User_API}/${id}`, options);
+    console.log(response);
 
-  toast.error("user removed");
+    const jsonData = await response.json();
+    return jsonData;
+
+    toast.error("user removed");
+  } catch (error) {
+    console.log(error);
+  }
 };
