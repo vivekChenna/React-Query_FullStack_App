@@ -55,7 +55,6 @@ const UserDetails = () => {
   });
 
   const {
-    status: addUserStatus,
     mutate: addUserMutation,
     isPending: isAddingUser,
     isError: isErrorAddUser,
@@ -66,32 +65,43 @@ const UserDetails = () => {
         return [...oldQueryData, data];
       });
     },
-    onError: (error) => {
-      console.log("something went wrong" + error.message);
+    onError: () => {
+      toast.error("failed to add new user ");
     },
   });
 
-  const { mutate: removeUserMutation, isPending: isRemovingUser } = useMutation(
-    {
-      mutationFn: deleteUser,
-      onSuccess: (data) => {
-        queryClient.setQueryData(["users"], (oldQueryData) => {
-          return oldQueryData.filter((obj) => {
-            return obj.id !== data.id;
-          });
+  const {
+    mutate: removeUserMutation,
+    isPending: isRemovingUser,
+    isError: isErrorRemoveUser,
+  } = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["users"], (oldQueryData) => {
+        return oldQueryData.filter((obj) => {
+          return obj.id !== data.id;
         });
-      },
-    }
-  );
+      });
+    },
+    onError: () => {
+      toast.error("failed to remove user");
+    },
+    // throwOnError: true,
+  });
 
-  const { mutate: updateUserMutation, isPending: isUpdatingUser } = useMutation(
-    {
-      mutationFn: updateUser,
-      onSuccess: () => {
-        queryClient.invalidateQueries(["users"]);
-      },
-    }
-  );
+  const {
+    mutate: updateUserMutation,
+    isPending: isUpdatingUser,
+    isError: isErrorUpdateUser,
+  } = useMutation({
+    mutationFn: updateUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+    },
+    onError: () => {
+      toast.error("failed to update user details");
+    },
+  });
 
   if (isLoading) {
     return (
@@ -142,14 +152,14 @@ const UserDetails = () => {
       updateUserMutation({ ...newUserDetails, id: id });
     }
   };
-
-
+  console.log("is error add user");
+  console.log(isErrorAddUser);
 
   return (
     <div className=" w-[1100px] mx-auto mt-4 mb-4">
       <AddUserForm AddUserFunction={AddUserFunction} />
 
-      {isErrorAddUser ? (
+      {isErrorAddUser || isErrorRemoveUser || isErrorUpdateUser ? (
         <div className="text-center">
           <p className=" font-semibold text-4xl text-red-500">
             Something went wrong
