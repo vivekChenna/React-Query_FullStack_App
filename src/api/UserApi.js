@@ -70,9 +70,8 @@ export const deleteUser = async (id) => {
     console.log(response);
 
     const jsonData = await response.json();
-    return jsonData;
-
     toast.error("user removed");
+    return jsonData;
   } catch (error) {
     console.log(error);
   }
